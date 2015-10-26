@@ -45,12 +45,14 @@ public class GPUSort {
 
   public void sort(){
     //should have 192 threads per SM
+	// inner array size
     int size = 2048;
     int sizeBy2 = size / 2;
     //int numMultiProcessors = 14;
     //int blocksPerMultiProcessor = 512;
     int numMultiProcessors = 2;
     int blocksPerMultiProcessor = 256;
+
     int outerCount = numMultiProcessors*blocksPerMultiProcessor;
     int[][] array = new int[outerCount][];
     for(int i = 0; i < outerCount; ++i){
@@ -65,22 +67,25 @@ public class GPUSort {
     context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
     context0.setKernel(new GPUSortKernel(array));
     context0.buildState();
-    
+
+    // limit the run
     int counter = 0;
-    while(counter < 3){
+    while(counter < 10){
       counter += 1;
 
 //  while(true){
-
+      // fill the array
       for(int i = 0; i < outerCount; ++i){
         fisherYates(array[i]);
       }
 //      System.out.println(Arrays.deepToString(array));
       long gpuStart = System.currentTimeMillis();
+      // sort the arrays
       context0.run();
+
+      // stats and stat output
       long gpuStop = System.currentTimeMillis();
       long gpuTime = gpuStop - gpuStart;
-
       StatsRow row0 = context0.getStats();
       System.out.println("serialization_time: "+row0.getSerializationTime());
       System.out.println("driver_memcopy_to_device_time: "+row0.getDriverMemcopyToDeviceTime());
@@ -90,11 +95,14 @@ public class GPUSort {
       System.out.println("deserialization_time: "+row0.getDeserializationTime());
       System.out.println("gpu_required_memory: "+context0.getRequiredMemory());
       System.out.println("gpu_time: "+gpuTime);
+      
+      // check that array was properly sorted
+      // populate with new random numbers
       for(int i = 0; i < outerCount; ++i){
         checkSorted(array[i], i);
         fisherYates(array[i]);
       }
-
+      // sort on CPU as reference for comparison 
       long cpuStart = System.currentTimeMillis();
       for(int i = 0; i < outerCount; ++i){
         Arrays.sort(array[i]);
@@ -108,7 +116,7 @@ public class GPUSort {
 
 
     }
-    //context0.close();
+//    context0.close();
   }
 
   public static void main(String[] args){
