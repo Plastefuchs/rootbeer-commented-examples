@@ -1,8 +1,15 @@
 #!/bin/sh
 
 ant clean
+
+#ant jar
+#echo "*******************pack rootbeer***********************"
+#./pack-rootbeer
+#java -jar lib/pack.jar -mainjar dist/Rootbeer1.jar -directory lib -destjar Rootbeer.jar
+
+echo "*******************ant jar***********************"
 ant jar
-./pack-rootbeer
-ant jar
+echo "*******************pack ScalarAdd***********************"
 java -jar ext/Rootbeer.jar dist/ScalarAddApp.jar dist/ScalarAddApp-GPU.jar -64bit
+echo "*******************pack ScalarSquare***********************"
 java -jar ext/Rootbeer.jar dist/ScalarSquareApp.jar dist/ScalarSquareApp-GPU.jar -64bit

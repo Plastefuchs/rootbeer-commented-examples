@@ -1,3 +1,6 @@
 #!/bin/bash
 
+echo "*** Running ScalarAdd ***"
 java -jar dist/ScalarAddApp-GPU.jar
+echo "** Running ScalarSquare ***"
+java -jar dist/ScalarSquareApp-GPU.jar
