@@ -5,3 +5,4 @@ ant jar
 ./pack-rootbeer
 ant jar
 java -jar ext/Rootbeer.jar dist/ScalarAddApp.jar dist/ScalarAddApp-GPU.jar -64bit
+java -jar ext/Rootbeer.jar dist/ScalarSquareApp.jar dist/ScalarSquareApp-GPU.jar -64bit

@@ -12,5 +12,10 @@
           <attribute name="Main-Class" value="org.trifort.rootbeer.examples.scalaradd.ScalarAddApp"/>
         </manifest>
       </jar>
+	    <jar destfile="dist/ScalarSquareApp.jar" basedir="build/classes">
+	      <manifest>
+	        <attribute name="Main-Class" value="org.trifort.rootbeer.examples.scalarsquare.ScalarSquareApp"/>
+	      </manifest>
+	    </jar>
     </target>
 </project>

@@ -9,7 +9,7 @@ import org.trifort.rootbeer.runtime.util.Stopwatch;
 
 public class ScalarAddApp {
 
-  public void multArray(int[] array){
+  public void multArrayAdd(int[] array){
     List<Kernel> tasks = new ArrayList<Kernel>();
     for(int index = 0; index < array.length; ++index){
       tasks.add(new ScalarAddKernel(array, index));
@@ -27,6 +27,7 @@ public class ScalarAddApp {
 
   public static void main(String[] args){
     ScalarAddApp app = new ScalarAddApp();
+     
     int length = 10;
     int[] array = new int[length];
     for(int index = 0; index < array.length; ++index){
@@ -34,7 +35,7 @@ public class ScalarAddApp {
     }
 
     app.printArray("start", array);
-    app.multArray(array);
+    app.multArrayAdd(array);
     app.printArray("end", array);
   }
 }

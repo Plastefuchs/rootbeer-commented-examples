@@ -17,3 +17,4 @@ public class ScalarAddKernel implements Kernel {
     array[index] += 1;
   }
 }
+
