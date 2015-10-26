@@ -65,11 +65,17 @@ public class GPUSort {
     context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
     context0.setKernel(new GPUSortKernel(array));
     context0.buildState();
+    
+    int counter = 0;
+    while(counter < 3){
+      counter += 1;
 
-    while(true){
+//  while(true){
+
       for(int i = 0; i < outerCount; ++i){
         fisherYates(array[i]);
       }
+//      System.out.println(Arrays.deepToString(array));
       long gpuStart = System.currentTimeMillis();
       context0.run();
       long gpuStop = System.currentTimeMillis();
@@ -84,7 +90,6 @@ public class GPUSort {
       System.out.println("deserialization_time: "+row0.getDeserializationTime());
       System.out.println("gpu_required_memory: "+context0.getRequiredMemory());
       System.out.println("gpu_time: "+gpuTime);
-
       for(int i = 0; i < outerCount; ++i){
         checkSorted(array[i], i);
         fisherYates(array[i]);
@@ -99,14 +104,18 @@ public class GPUSort {
       System.out.println("cpu_time: "+cpuTime);
       double ratio = (double) cpuTime / (double) gpuTime;
       System.out.println("ratio: "+ratio);
+//      System.out.println(Arrays.deepToString(array));
+
+
     }
     //context0.close();
   }
 
   public static void main(String[] args){
     GPUSort sorter = new GPUSort();
-    while(true){
-      sorter.sort();
-    }
+    sorter.sort();
+//    while(true){
+//      sorter.sort();
+//    }
   }
 }
