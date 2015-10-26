@@ -1,0 +1,7 @@
+#!/bin/sh
+
+ant clean
+ant jar
+./pack-rootbeer
+
+java -jar ../rblib/Rootbeer.jar MMultApp.jar MMultApp-GPU.jar -64bit
