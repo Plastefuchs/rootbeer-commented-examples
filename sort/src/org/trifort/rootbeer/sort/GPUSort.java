@@ -40,10 +40,10 @@ public class GPUSort {
     	/* Returns a pseudorandom, uniformly distributed int value 
     	   between 0 (inclusive) and the specified value (exclusive), 
     	   drawn from this random number generator's sequence. */
-      int index = random.nextInt(i + 1);
-      int a = array[index];
-      array[index] = array[i];
-      array[i] = a;
+      int index = random.nextInt(i + 1); // one random index
+      int a = array[index]; // content of the field
+      array[index] = array[i]; // set content of the field to content of the current i field
+      array[i] = a; // set content of the current i field to the old content of the field
     }
   }
 
@@ -113,6 +113,8 @@ public class GPUSort {
 
 //  while(true){
       //randomize the array to be sorted
+
+
       for(int i = 0; i < outerCount; ++i){
         fisherYates(array[i]);
       }

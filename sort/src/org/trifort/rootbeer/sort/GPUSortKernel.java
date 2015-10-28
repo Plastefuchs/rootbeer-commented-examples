@@ -41,6 +41,9 @@ public class GPUSortKernel implements Kernel {
     //outer pass
     int arrayLength = array.length >> 1;
     for(int i = 0; i < arrayLength; ++i){
+      //get/set integer in shared memory. requires 4 bytes.
+      //index is byte offset into shared memory
+      // http://devblogs.nvidia.com/parallelforall/using-shared-memory-cuda-cc/
       int value1 = RootbeerGpu.getSharedInteger(index1a_shared);
       int value2 = RootbeerGpu.getSharedInteger(index1b_shared);
       int shared_value = value1;
@@ -51,7 +54,7 @@ public class GPUSortKernel implements Kernel {
         RootbeerGpu.setSharedInteger(index1a_shared, value2);
         RootbeerGpu.setSharedInteger(index1b_shared, value1);
       }
-      
+      // wait for all threads
       RootbeerGpu.syncthreads();
       
       if(index2a >= 0){
