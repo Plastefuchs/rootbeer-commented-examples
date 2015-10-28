@@ -9,6 +9,7 @@ import org.trifort.rootbeer.runtime.CacheConfig;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class GPUSort {
 
@@ -36,6 +37,9 @@ public class GPUSort {
   {
     Random random = new Random();
     for (int i = array.length - 1; i > 0; i--){
+    	/* Returns a pseudorandom, uniformly distributed int value 
+    	   between 0 (inclusive) and the specified value (exclusive), 
+    	   drawn from this random number generator's sequence. */
       int index = random.nextInt(i + 1);
       int a = array[index];
       array[index] = array[i];
@@ -43,30 +47,64 @@ public class GPUSort {
     }
   }
 
+  // Titan> http://www.anandtech.com/show/6760/nvidias-geforce-gtx-titan-part-1/4
+  // 2888 Cores, 6143 MB Dedicated Memory
+  // 32 threads / warp | 64 warps / SM
+  // 2048 threads / SM
+  // 255kb register per thread
+  // 64 FP64 CUDA cores -> 2 FP64 SM
+  // 14 SM 
+  
   public void sort(){
+
     //should have 192 threads per SM
+	  
 	// inner array size
     int size = 2048;
     int sizeBy2 = size / 2;
-    //int numMultiProcessors = 14;
-    //int blocksPerMultiProcessor = 512;
-    int numMultiProcessors = 2;
-    int blocksPerMultiProcessor = 256;
-
+    int numMultiProcessors = 14;
+    int blocksPerMultiProcessor = 512;
+//    int numMultiProcessors = 2;
+//    int blocksPerMultiProcessor = 256;
+    // set size of the outer array to be
     int outerCount = numMultiProcessors*blocksPerMultiProcessor;
     int[][] array = new int[outerCount][];
+    // create array as wide as the number of SM * the blocks per SM
+    // create one size wide inner array per block(thread group)
     for(int i = 0; i < outerCount; ++i){
       array[i] = newArray(size);
     }
-
+    
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext(4212880);
+    //create a context with 4212880 bytes objectMemory.
+    //you can leave the 4212880 missing at first to
+    //use all available GPU memory. after you run you
+    //can call context0.getRequiredMemory() to see
+    //what value to enter here
+    Context context0 = device0.createContext(); // 4212880
+  //use more die area for shared memory instead of
+    //cache. the shared memory is a software defined
+    //cache that, if programmed properly, can perform
+    //better than the hardware cache
+    //see (CUDA Occupancy calculator)[http://developer.download.nvidia.com/compute/cuda/CUDA_Occupancy_calculator.xls]
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
+    //wire thread config for throughput mode. after
+    //calling buildState, the book-keeping information
+    //will be cached in the JNI driver
     context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
+    //configure to use kernel templates. rather than
+    //using kernel lists where each thread has a Kernel
+    //object, there is only one kernel object (less memory copies)
+    //when using kernel templates you need to differetiate
+    //your data using thread/block indexes
     context0.setKernel(new GPUSortKernel(array));
+    //cache the state and get ready for throughput mode
     context0.buildState();
+    
+    List<Double> ratioList = new ArrayList<Double>(1);
+    int runs = 0;
 
     // limit the run
     int counter = 0;
@@ -74,13 +112,15 @@ public class GPUSort {
       counter += 1;
 
 //  while(true){
-      // fill the array
+      //randomize the array to be sorted
       for(int i = 0; i < outerCount; ++i){
         fisherYates(array[i]);
       }
 //      System.out.println(Arrays.deepToString(array));
       long gpuStart = System.currentTimeMillis();
-      // sort the arrays
+      //run the cached throughput mode state.
+      //the data now reachable from the only
+      //GPUSortKernel is serialized to the GPU
       context0.run();
 
       // stats and stat output
@@ -113,9 +153,17 @@ public class GPUSort {
       double ratio = (double) cpuTime / (double) gpuTime;
       System.out.println("ratio: "+ratio);
 //      System.out.println(Arrays.deepToString(array));
+      runs += 1;
+      ratioList.add(ratio);
 
 
     }
+    double averageRatio = 0;
+    for (double ratio : ratioList){
+    	averageRatio += ratio;
+    }
+    System.out.println("Number of runs: " + runs);
+    System.out.println("Average ratio of GPU<->CPU: "+averageRatio/runs);
 //    context0.close();
   }
 

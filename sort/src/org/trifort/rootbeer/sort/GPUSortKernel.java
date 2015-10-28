@@ -14,21 +14,28 @@ public class GPUSortKernel implements Kernel {
 
   @Override
   public void gpuMethod(){
+	  // one one-dimensional inner array per block
     int[] array = arrays[RootbeerGpu.getBlockIdxx()];
     int index1a = RootbeerGpu.getThreadIdxx() << 1;
     int index1b = index1a + 1;
     int index2a = index1a - 1;
     int index2b = index1a;
+    
     int index1a_shared = index1a << 2;
     int index1b_shared = index1b << 2;
     int index2a_shared = index2a << 2;
     int index2b_shared = index2b << 2;
-//    public static void setSharedInteger(int index, int value){
-//        sharedMem[index] = (byte) (value & 0xff);
-//        sharedMem[index + 1] = (byte) ((value >> 8)  & 0xff);
-//        sharedMem[index + 2] = (byte) ((value >> 16) & 0xff);
-//        sharedMem[index + 3] = (byte) ((value >> 24) & 0xff);
-//      }
+    /*
+    private static byte[] sharedMem;
+    
+    public static void setSharedInteger(int index, int value){
+        sharedMem[index] = (byte) (value & 0xff);
+        sharedMem[index + 1] = (byte) ((value >> 8)  & 0xff);
+        sharedMem[index + 2] = (byte) ((value >> 16) & 0xff);
+        sharedMem[index + 3] = (byte) ((value >> 24) & 0xff);
+      }
+    */
+ 
     RootbeerGpu.setSharedInteger(index1a_shared, array[index1a]);
     RootbeerGpu.setSharedInteger(index1b_shared, array[index1b]);
     //outer pass
@@ -37,7 +44,8 @@ public class GPUSortKernel implements Kernel {
       int value1 = RootbeerGpu.getSharedInteger(index1a_shared);
       int value2 = RootbeerGpu.getSharedInteger(index1b_shared);
       int shared_value = value1;
-      
+    
+      // comparison & swap
       if(value2 < value1){
         shared_value = value2;
         RootbeerGpu.setSharedInteger(index1a_shared, value2);
@@ -45,6 +53,7 @@ public class GPUSortKernel implements Kernel {
       }
       
       RootbeerGpu.syncthreads();
+      
       if(index2a >= 0){
         value1 = RootbeerGpu.getSharedInteger(index2a_shared);
         //value2 = RootbeerGpu.getSharedInteger(index2b_shared);
