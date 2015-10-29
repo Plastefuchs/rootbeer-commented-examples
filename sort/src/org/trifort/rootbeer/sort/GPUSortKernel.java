@@ -23,7 +23,7 @@ public class GPUSortKernel implements Kernel {
 
     if (RootbeerGpu.getBlockIdxx() == 1){
     	
-    	if ((RootbeerGpu.getThreadIdxx() << 1) == 32){
+    	if ((RootbeerGpu.getThreadIdxx() << 1) == 4){
           System.out.println(index1a);
     	}
   }
@@ -60,7 +60,7 @@ public class GPUSortKernel implements Kernel {
       int value2 = RootbeerGpu.getSharedInteger(index1b_shared);
       if (RootbeerGpu.getBlockIdxx() == 1){
         	
-        	if ((RootbeerGpu.getThreadIdxx() << 1) == 32){
+        	if ((RootbeerGpu.getThreadIdxx() << 1) == 4){
               System.out.println("val1: "+value1+" val2: "+value2);
         	}
       }
