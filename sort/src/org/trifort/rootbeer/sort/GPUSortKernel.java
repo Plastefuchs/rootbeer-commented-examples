@@ -23,7 +23,9 @@ public class GPUSortKernel implements Kernel {
 
     if (RootbeerGpu.getBlockIdxx() == 1){
     	
-    	System.out.println(RootbeerGpu.getThreadIdxx()<<1);
+    	if ((RootbeerGpu.getThreadIdxx() << 1) == 32){
+          System.out.println(index1a);
+    	}
   }
     RootbeerGpu.syncthreads();
     // pick adress in the shared memory
@@ -59,9 +61,7 @@ public class GPUSortKernel implements Kernel {
       if (RootbeerGpu.getBlockIdxx() == 1){
         	
         	if ((RootbeerGpu.getThreadIdxx() << 1) == 32){
-//              System.out.println("val1: "+value1+" val2: "+value2);
-              System.out.println(value1);
-
+              System.out.println("val1: "+value1+" val2: "+value2);
         	}
       }
       RootbeerGpu.syncthreads();

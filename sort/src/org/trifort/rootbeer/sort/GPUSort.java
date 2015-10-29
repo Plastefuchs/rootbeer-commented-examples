@@ -108,9 +108,9 @@ public class GPUSort {
     int runs = 0;
 
     // limit the run
-    int counter = 0;
-    while(counter < numberOfRuns){
-      counter += 1;
+    while(runs < numberOfRuns){
+      runs += 1;
+      System.out.println("Run "+runs+" start");
 
 //  while(true){
       //randomize the array to be sorted
@@ -156,7 +156,6 @@ public class GPUSort {
       double ratio = (double) cpuTime / (double) gpuTime;
       System.out.println("ratio: "+ratio);
 //      System.out.println(Arrays.deepToString(array));
-      runs += 1;
       ratioList.add(ratio);
 
 
