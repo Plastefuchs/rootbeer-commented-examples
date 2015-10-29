@@ -58,14 +58,15 @@ public class GPUSort {
   public void sort(){
 
     //should have 192 threads per SM
-	  
+	int numberOfRuns = 1;  
 	// inner array size
     int size = 2048;
     int sizeBy2 = size / 2;
-    int numMultiProcessors = 14;
-    int blocksPerMultiProcessor = 512;
-//    int numMultiProcessors = 2;
-//    int blocksPerMultiProcessor = 256;
+//    int numMultiProcessors = 14;
+//    int blocksPerMultiProcessor = 512;
+    int numMultiProcessors = 2;
+    int blocksPerMultiProcessor = 256;
+
     // set size of the outer array to be
     int outerCount = numMultiProcessors*blocksPerMultiProcessor;
     int[][] array = new int[outerCount][];
@@ -108,7 +109,7 @@ public class GPUSort {
 
     // limit the run
     int counter = 0;
-    while(counter < 10){
+    while(counter < numberOfRuns){
       counter += 1;
 
 //  while(true){
