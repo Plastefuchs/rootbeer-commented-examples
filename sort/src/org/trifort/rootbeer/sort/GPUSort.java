@@ -60,7 +60,8 @@ public class GPUSort {
     //should have 192 threads per SM
 	int numberOfRuns = 1;  
 	// inner array size
-    int size = 2048;
+//    int size = 2048;
+	int size = 8;
     int sizeBy2 = size / 2;
 //    int numMultiProcessors = 14;
 //    int blocksPerMultiProcessor = 512;
@@ -69,6 +70,7 @@ public class GPUSort {
 
     // set size of the outer array to be
     int outerCount = numMultiProcessors*blocksPerMultiProcessor;
+
     int[][] array = new int[outerCount][];
     // create array as wide as the number of SM * the blocks per SM
     // create one size wide inner array per block(thread group)
@@ -124,7 +126,10 @@ public class GPUSort {
       //run the cached throughput mode state.
       //the data now reachable from the only
       //GPUSortKernel is serialized to the GPU
+      System.out.println(Arrays.toString(array[0]));
+
       context0.run();
+      System.out.println(Arrays.toString(array[0]));
 
       // stats and stat output
       long gpuStop = System.currentTimeMillis();

@@ -2,7 +2,7 @@ package org.trifort.rootbeer.sort;
 
 import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.RootbeerGpu;
-
+import java.util.Arrays;
 
 public class GPUSortKernel implements Kernel {
 
@@ -21,13 +21,14 @@ public class GPUSortKernel implements Kernel {
     int index2a = index1a - 1;
     int index2b = index1a;
 
-    if (RootbeerGpu.getBlockIdxx() == 1){
-    	
-    	if ((RootbeerGpu.getThreadIdxx() << 1) == 4){
-          System.out.println(index1a);
-    	}
-  }
-    RootbeerGpu.syncthreads();
+//    if (RootbeerGpu.getBlockIdxx() == 0){
+//    	
+//    	if ((RootbeerGpu.getThreadIdxx() << 1) == 4){
+//          System.out.println(index1a +":"+array[index1a]);
+//    	}
+//  }
+//    RootbeerGpu.syncthreads();
+//    
     // pick adress in the shared memory
     int index1a_shared = index1a << 2;
     int index1b_shared = index1b << 2;
@@ -54,18 +55,22 @@ public class GPUSortKernel implements Kernel {
     int arrayLength = array.length >> 1;
 
     for(int i = 0; i < arrayLength; ++i){
-
+      
       // read value from shared memory
       int value1 = RootbeerGpu.getSharedInteger(index1a_shared);
       int value2 = RootbeerGpu.getSharedInteger(index1b_shared);
-      if (RootbeerGpu.getBlockIdxx() == 1){
-        	
-        	if ((RootbeerGpu.getThreadIdxx() << 1) == 4){
-              System.out.println("val1: "+value1+" val2: "+value2);
+      
+      if (RootbeerGpu.getBlockIdxx() == 0){
+        	if ((RootbeerGpu.getThreadIdxx() << 1) == 0){
+              System.out.println(RootbeerGpu.getThreadIdxx()+" val1: "+value1+" val2: "+value2);
+        	}
+        	RootbeerGpu.syncthreads(); 
+        	if ((RootbeerGpu.getThreadIdxx() << 1) == 1){
+              System.out.println(RootbeerGpu.getThreadIdxx()+" val1: "+value1+" val2: "+value2);
         	}
       }
+      
       RootbeerGpu.syncthreads();
-              
       int shared_value = value1;
     
       // compare & swap from right to left
